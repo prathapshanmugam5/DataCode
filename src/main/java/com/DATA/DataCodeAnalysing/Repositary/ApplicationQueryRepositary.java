@@ -5,8 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.DATA.DataCodeAnalysing.Entity.AppliCationQuery;
 
-
 @Repository
-public interface ApplicationQueryRepositary extends JpaRepository<AppliCationQuery,String>{
+public interface ApplicationQueryRepositary extends JpaRepository<AppliCationQuery, Long> {
 
 }

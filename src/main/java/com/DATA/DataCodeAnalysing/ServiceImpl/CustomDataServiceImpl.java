@@ -20,55 +20,48 @@ import com.DATA.DataCodeAnalysing.Service.CustomDataService;
 @Service
 public class CustomDataServiceImpl implements CustomDataService {
 
-    @Autowired
-    ApplicationQueryRepositary applicationQueryDTORepositary;
+	@Autowired
+	ApplicationQueryRepositary applicationQueryDTORepositary;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+	@Autowired
+	JdbcTemplate jdbcTemplate;
 
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(\\w+)}");
+	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(\\w+)}");
 
-    public BaseDTO getDataFromDataCode(DataCodeDetails dataCode) {
-        BaseDTO baseDto = new BaseDTO();
+	public BaseDTO getDataFromDataCode(DataCodeDetails dataCode) {
+		BaseDTO baseDto = new BaseDTO();
 
-  
-        Map<String, Object> queryContent = jdbcTemplate.queryForMap(
-            "SELECT * FROM application_queries WHERE query_name = ?",
-            dataCode.getDataCode()
-        );
+		Map<String, Object> queryContent = jdbcTemplate
+				.queryForMap("SELECT * FROM application_queries WHERE query_name = ?", dataCode.getDataCode());
 
-   
-        String sql = (String) queryContent.get("query_content");
+		String sql = (String) queryContent.get("query_content");
 
-  
-        Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
-        Set<String> placeholders = new HashSet<>();
-        while (matcher.find()) {
-            placeholders.add(matcher.group(1));
-        }
+		Map<String, String> params = dataCode.getPlaceholderKeyValueMap();
+		if (params != null && !params.isEmpty()) {
+			Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
+			Set<String> placeholders = new HashSet<>();
+			while (matcher.find()) {
+				placeholders.add(matcher.group(1));
+			}
 
-    
-        Map<String, String> params = dataCode.getPlaceholderKeyValueMap();
-        if (!params.keySet().containsAll(placeholders)) {
-            baseDto.setStatusCode(1); // Set an error status code
-            baseDto.setResponseContent(Collections.singletonMap("error", "Missing required parameters"));
-            return baseDto;
-        }
+			if (!params.keySet().containsAll(placeholders)) {
+				baseDto.setStatusCode(1); // Set an error status code
+				baseDto.setResponseContent(Collections.singletonMap("error", "Missing required parameters"));
+				return baseDto;
+			}
 
-     
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            String placeholder = "\\$\\{" + entry.getKey() + "\\}"; // Escape the ${} for regex
-            String value = entry.getValue();
-            sql = sql.replaceAll(placeholder, value);
-        }
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				String placeholder = "\\$\\{" + entry.getKey() + "\\}"; // Escape the ${} for regex
+				String value = entry.getValue();
+				sql = sql.replaceAll(placeholder, value);
+			}
+		}
 
-       
-        List<Map<String, Object>> listData = jdbcTemplate.queryForList(sql);
+		List<Map<String, Object>> listData = jdbcTemplate.queryForList(sql);
 
-   
-        baseDto.setStatusCode(0);
-        baseDto.setResponseContent(listData);
+		baseDto.setStatusCode(0);
+		baseDto.setResponseContent(listData);
 
-        return baseDto;
-    }
+		return baseDto;
+	}
 }

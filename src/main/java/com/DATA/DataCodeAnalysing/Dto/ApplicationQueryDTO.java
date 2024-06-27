@@ -6,7 +6,6 @@ import lombok.Data;
 public class ApplicationQueryDTO {
 	
 	private long id;
-	
 	private String QueryName;
 	private String QueryContent;
 
