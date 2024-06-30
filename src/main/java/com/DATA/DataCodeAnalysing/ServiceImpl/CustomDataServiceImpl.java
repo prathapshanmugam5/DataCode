@@ -37,7 +37,7 @@ public class CustomDataServiceImpl implements CustomDataService {
 		String sql = (String) queryContent.get("query_content");
 
 		Map<String, String> params = dataCode.getPlaceholderKeyValueMap();
-		if (params != null && !params.isEmpty()) {
+		if (params != null) {
 			Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
 			Set<String> placeholders = new HashSet<>();
 			while (matcher.find()) {
