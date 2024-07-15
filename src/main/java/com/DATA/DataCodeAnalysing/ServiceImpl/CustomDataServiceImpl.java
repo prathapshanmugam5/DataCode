@@ -20,48 +20,70 @@ import com.DATA.DataCodeAnalysing.Service.CustomDataService;
 @Service
 public class CustomDataServiceImpl implements CustomDataService {
 
-	@Autowired
-	ApplicationQueryRepositary applicationQueryDTORepositary;
+    @Autowired
+    ApplicationQueryRepositary applicationQueryDTORepositary;
 
-	@Autowired
-	JdbcTemplate jdbcTemplate;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
-	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(\\w+)}");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(\\w+)}");
 
-	public BaseDTO getDataFromDataCode(DataCodeDetails dataCode) {
-		BaseDTO baseDto = new BaseDTO();
+    @Override
+    public BaseDTO getDataFromDataCode(DataCodeDetails dataCode) {
+        BaseDTO baseDto = new BaseDTO();
 
-		Map<String, Object> queryContent = jdbcTemplate
-				.queryForMap("SELECT * FROM application_queries WHERE query_name = ?", dataCode.getDataCode());
+        // Retrieve the query content
+        List<Map<String, Object>> queryResult = jdbcTemplate.queryForList("SELECT * FROM application_queries WHERE query_name = ?", dataCode.getDataCode());
+        
+        if (queryResult.isEmpty()) {
+            baseDto.setStatusCode(1); // Set an error status code
+            baseDto.setResponseContent(Collections.singletonMap("error", "No query found for the given data code"));
+            return baseDto;
+        }
 
-		String sql = (String) queryContent.get("query_content");
+        // Assuming only one row is returned for a specific data code
+        Map<String, Object> queryContent = queryResult.get(0);
+        String sql = (String) queryContent.get("query_content");
 
-		Map<String, String> params = dataCode.getPlaceholderKeyValueMap();
-		if (params != null) {
-			Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
-			Set<String> placeholders = new HashSet<>();
-			while (matcher.find()) {
-				placeholders.add(matcher.group(1));
-			}
+        Map<String, String> params = dataCode.getPlaceholderKeyValueMap();
+        if (params != null) {
+            Matcher matcher = PLACEHOLDER_PATTERN.matcher(sql);
+            Set<String> placeholders = new HashSet<>();
+            while (matcher.find()) {
+                placeholders.add(matcher.group(1));
+            }
 
-			if (!params.keySet().containsAll(placeholders)) {
-				baseDto.setStatusCode(1); // Set an error status code
-				baseDto.setResponseContent(Collections.singletonMap("error", "Missing required parameters"));
-				return baseDto;
-			}
+            if (!params.keySet().containsAll(placeholders)) {
+                baseDto.setStatusCode(1); // Set an error status code
+                baseDto.setResponseContent(Collections.singletonMap("error", "Missing required parameters"));
+                return baseDto;
+            }
 
-			for (Map.Entry<String, String> entry : params.entrySet()) {
-				String placeholder = "\\$\\{" + entry.getKey() + "\\}"; // Escape the ${} for regex
-				String value = entry.getValue();
-				sql = sql.replaceAll(placeholder, value);
-			}
-		}
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                String placeholder = "\\$\\{" + entry.getKey() + "\\}"; // Escape the ${} for regex
+                String value = entry.getValue();
+                sql = sql.replaceAll(placeholder, value);
+            }
+        }
 
-		List<Map<String, Object>> listData = jdbcTemplate.queryForList(sql);
+        // Execute the final query and fetch results
+        List<Map<String, Object>> listData = jdbcTemplate.queryForList(sql);
+        
+        if(listData.isEmpty()) {
+        	 baseDto.setStatusCode(1);
+             baseDto.setResponseContent(listData);
+             baseDto.setErrorMessage(null);
+        	return baseDto;
+        }
+        if(!listData.isEmpty()) {
+       	 baseDto.setStatusCode(0);
+            baseDto.setResponseContent(listData);
+            baseDto.setErrorMessage("Success");
+            return baseDto;
+       }
 
-		baseDto.setStatusCode(0);
-		baseDto.setResponseContent(listData);
+       
 
-		return baseDto;
-	}
+        return baseDto;
+    }
 }

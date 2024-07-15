@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -16,14 +18,18 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
 		http.csrf().disable()
 		.authorizeRequests()
-		.requestMatchers("customdata/getdata").permitAll()
+		.requestMatchers("customdata/getdata","user/register").permitAll()
 		.anyRequest().authenticated()
 		.and().httpBasic().and()
 		.sessionManagement()
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	
+
 		return http.build();
 		
 	}
 
+	@Bean
+	public BCryptPasswordEncoder PasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }
