@@ -10,6 +10,9 @@ import com.DATA.DataCodeAnalysing.Dto.BaseDTO;
 import com.DATA.DataCodeAnalysing.Dto.DataCodeDetails;
 import com.DATA.DataCodeAnalysing.Service.CustomDataService;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/customdata")
 public class CustomDataController {
