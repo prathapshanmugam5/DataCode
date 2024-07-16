@@ -10,4 +10,6 @@ public interface UserRegisterLoginService {
 
 	BaseDTO UserRegistration(UserInfo userInfo);
 
+	BaseDTO UserLogin(UserInfo userInfo);
+
 }

@@ -27,5 +27,13 @@ public class UserRegisterLoginController {
  		return userRegisterLoginService.UserRegistration(userInfo);
 	}
 	
+	
+	@PostMapping("/login")
+	public BaseDTO UserLogin( @RequestBody UserInfo  userInfo) {
+ 		return userRegisterLoginService.UserLogin(userInfo);
+	}
+	
+
+	
 
 }
