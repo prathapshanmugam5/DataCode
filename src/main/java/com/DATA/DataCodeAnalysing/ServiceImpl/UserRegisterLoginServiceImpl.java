@@ -1,6 +1,7 @@
 package com.DATA.DataCodeAnalysing.ServiceImpl;
 
-import java.util.HashMap;
+
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.DATA.DataCodeAnalysing.Dto.BaseDTO;
-import com.DATA.DataCodeAnalysing.Dto.DataCodeDetails;
+
 import com.DATA.DataCodeAnalysing.Entity.UserInfo;
 import com.DATA.DataCodeAnalysing.Repositary.UserInfoRepositary;
 import com.DATA.DataCodeAnalysing.Service.UserRegisterLoginService;
@@ -28,30 +29,70 @@ public class UserRegisterLoginServiceImpl implements UserRegisterLoginService {
 
 	@Override
 	public BaseDTO UserRegistration(UserInfo userInfo) {
+		
+		
 
 		BaseDTO baseDTO = new BaseDTO();
 
 		BaseDTO baseDTOOne = new BaseDTO();
+		
+		
+		
+		if (userInfo.getEmail() == "" || userInfo.getUsername() == "" || userInfo.getPassword() == "" || userInfo.getEmail() == null||userInfo.getUsername() == null||userInfo.getPassword() == null) {
 
-		DataCodeDetails dataCodeDetails = new DataCodeDetails();
-		DataCodeDetails dataCodeDetailsOne = new DataCodeDetails();
+			baseDTO.setStatusCode(1);
+			baseDTO.setErrorMessage("Please Fill All the fields");
+			baseDTO.setResponseContent(null);
+			return baseDTO;
+		}
 
-		Map<String, String> placeholderMap = new HashMap<>();
-		Map<String, String> placeholderMapOne = new HashMap<>();
 
-		if (userInfo.getEmail() != "" && userInfo.getUsername() != "" && userInfo.getPassword() != "") {
+//		DataCodeDetails dataCodeDetails = new DataCodeDetails();
+//		DataCodeDetails dataCodeDetailsOne = new DataCodeDetails();
+//
+//		Map<String, String> placeholderMap = new HashMap<>();
+//		Map<String, String> placeholderMapOne = new HashMap<>();
 
-			placeholderMap.put("username", "'" + userInfo.getUsername() + "'");
-			placeholderMapOne.put("email", "'" + userInfo.getEmail() + "'");
+		if (userInfo.getEmail() != "" && userInfo.getUsername() != "" && userInfo.getPassword() != "" || userInfo.getEmail() != null||userInfo.getUsername() != null||userInfo.getPassword() != null ) {
 
-			dataCodeDetails.setDataCode("GET_USER_DETAILS_BY_USERNAME");
-			dataCodeDetailsOne.setDataCode("GET_USER_DETAILS_BY_EMAIL");
-
-			dataCodeDetails.setPlaceholderKeyValueMap(placeholderMap);
-			dataCodeDetailsOne.setPlaceholderKeyValueMap(placeholderMapOne);
-
-			baseDTO = customDataServiceImpl.getDataFromDataCode(dataCodeDetails);
-			baseDTOOne = customDataServiceImpl.getDataFromDataCode(dataCodeDetailsOne);
+//			placeholderMap.put("username", "'" + userInfo.getUsername() + "'");
+//			placeholderMapOne.put("email", "'" + userInfo.getEmail() + "'");
+//
+//			dataCodeDetails.setDataCode("GET_USER_DETAILS_BY_USERNAME");
+//			dataCodeDetailsOne.setDataCode("GET_USER_DETAILS_BY_EMAIL");
+//
+//			dataCodeDetails.setPlaceholderKeyValueMap(placeholderMap);
+//			dataCodeDetailsOne.setPlaceholderKeyValueMap(placeholderMapOne);
+			
+			  UserInfo userDetailByEmail=userInfoRepositary.findByEmail(userInfo.getEmail());
+			  UserInfo userDetailUserName=userInfoRepositary.findByUsername(userInfo.getUsername());
+		        
+		        if(userDetailUserName!=null) {
+		        	baseDTOOne.setStatusCode(0);
+		        	baseDTOOne.setErrorMessage("Login Success");
+		        	baseDTOOne.setResponseContent(userDetailUserName); 
+		        	
+		        }
+		        if(userDetailUserName==null) {
+		        	baseDTOOne.setStatusCode(1);
+		        	baseDTOOne.setErrorMessage("User Already Exists");
+		        	baseDTOOne.setResponseContent(userDetailUserName); 
+		        	
+		        }
+		        
+		        if(userDetailByEmail!=null) {
+		        	 baseDTO.setStatusCode(0);
+	                 baseDTO.setErrorMessage("Login Success");
+	                 baseDTO.setResponseContent(userDetailByEmail); 
+		        	
+		        }
+		        if(userDetailByEmail==null) {
+		        	 baseDTO.setStatusCode(1);
+	                baseDTO.setErrorMessage("User Already Exists");
+	                baseDTO.setResponseContent(userDetailByEmail); 
+		        	
+		        }
+			
 
 			if (baseDTO.getStatusCode() == 0 || baseDTOOne.getStatusCode() == 0) {
 				baseDTO.setStatusCode(1);
@@ -67,19 +108,14 @@ public class UserRegisterLoginServiceImpl implements UserRegisterLoginService {
 				UserInfo userDetail = userInfoRepositary.save(userInfo);
 
 				baseDTO.setStatusCode(0);
+				baseDTO.setErrorMessage("Register Success");
 				baseDTO.setResponseContent(userDetail);
 				return baseDTO;
 			}
 
 		}
 
-		if (userInfo.getEmail() == "" || userInfo.getUsername() == "" || userInfo.getPassword() == "") {
 
-			baseDTO.setStatusCode(1);
-			baseDTO.setErrorMessage("Please Fill All the fields");
-			baseDTO.setResponseContent(null);
-			return baseDTO;
-		}
 
 		return baseDTO;
 	}
@@ -89,29 +125,50 @@ public class UserRegisterLoginServiceImpl implements UserRegisterLoginService {
 		
 	    BaseDTO baseDTO = new BaseDTO();
 
-	    DataCodeDetails dataCodeDetailsOne = new DataCodeDetails();
-	    Map<String, String> placeholderMapOne = new HashMap<>();
+//	    DataCodeDetails dataCodeDetailsOne = new DataCodeDetails();
+//	    Map<String, String> placeholderMapOne = new HashMap<>();
 
 	    if (!userInfo.getEmail().isEmpty() && !userInfo.getPassword().isEmpty()) {
 	    	
-	    	placeholderMapOne.put("email", "'" + userInfo.getEmail() + "'");
-	        dataCodeDetailsOne.setDataCode("GET_USER_DETAILS_BY_EMAIL");
-	        dataCodeDetailsOne.setPlaceholderKeyValueMap(placeholderMapOne);
-
-	        baseDTO = customDataServiceImpl.getDataFromDataCode(dataCodeDetailsOne);
+//	    	placeholderMapOne.put("email", "'" + userInfo.getEmail() + "'");
+//	        dataCodeDetailsOne.setDataCode("GET_USER_DETAILS_BY_EMAIL");
+//	        dataCodeDetailsOne.setPlaceholderKeyValueMap(placeholderMapOne);
+//	        
+//	        userInfo.setUsername("prathap"); 
+	    
+	        UserInfo userDetail=userInfoRepositary.findByEmail(userInfo.getEmail());
+	        
+	        if(userDetail!=null) {
+	        	 baseDTO.setStatusCode(0);
+                 baseDTO.setErrorMessage("Login Success");
+                 baseDTO.setResponseContent(userDetail); 
+                 
+               
+                
+	        	
+	        }
+	        if(userDetail==null) {
+	        	 baseDTO.setStatusCode(1);
+                baseDTO.setErrorMessage("User Not Found");
+                baseDTO.setResponseContent(userDetail); 
+          
+                
+	        	
+	        }
+	        
+	    
 
 	        if (baseDTO.getStatusCode() == 0) {
 	            // Assuming baseDTO.getResponseContent() returns a list of maps, where each map is a row from the database
-	            List<Map<String, Object>> userList = (List<Map<String, Object>>) baseDTO.getResponseContent();
+	        
 
-	            if (!userList.isEmpty()) {
-	                Map<String, Object> userMap = userList.get(0); // Get the first (and only) user record
-	                String storedPassword = (String) userMap.get("password");
+	            	               // Get the first (and only) user record
+	                String storedPassword = userDetail.getPassword();
 
 	                if (bCryptPasswordEncoder.matches(userInfo.getPassword(), storedPassword)) {
 	                    baseDTO.setStatusCode(0);
 	                    baseDTO.setErrorMessage("Login Success");
-	                    baseDTO.setResponseContent(userMap); // Optionally, you can set the user info as the response content
+	                    baseDTO.setResponseContent(userDetail); // Optionally, you can set the user info as the response content
 	                    return baseDTO;
 	                } else {
 	                    baseDTO.setStatusCode(1);
@@ -127,7 +184,7 @@ public class UserRegisterLoginServiceImpl implements UserRegisterLoginService {
 	            }
 	        }
 
-	    }
+	    
 
 	    if (userInfo.getEmail().isEmpty() || userInfo.getPassword().isEmpty()) {
 	        baseDTO.setStatusCode(1);

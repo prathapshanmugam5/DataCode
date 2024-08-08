@@ -1,6 +1,7 @@
 package com.DATA.DataCodeAnalysing.Entity;
 
 import jakarta.persistence.Entity;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,6 +23,6 @@ public class StateMaster {
 	private String StateCode;
 	@ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
-    private CountryMaster country;
+    private CountryMaster countryId;
 
 }

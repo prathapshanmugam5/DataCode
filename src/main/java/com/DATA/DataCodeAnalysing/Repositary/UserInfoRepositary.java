@@ -7,6 +7,11 @@ import com.DATA.DataCodeAnalysing.Entity.UserInfo;
 
 @Repository
 public interface UserInfoRepositary extends JpaRepository<UserInfo, Long> {
+	
+	
+	public UserInfo findByUsername(String username);
+
+	public UserInfo findByEmail(String username);
 
 
 }

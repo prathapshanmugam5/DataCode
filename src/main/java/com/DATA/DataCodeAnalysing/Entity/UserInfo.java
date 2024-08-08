@@ -1,5 +1,6 @@
 package com.DATA.DataCodeAnalysing.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +18,8 @@ public class UserInfo {
 	private long id;
 	private String username;
 	private String password;
+	
+	@Column(unique = true)
 	private String email;
 
 }
