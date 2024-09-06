@@ -11,12 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.DATA.DataCodeAnalysing.Service.GitHubService;
 
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/files")
 public class ImageController {
 	@Autowired
     private GitHubService gitHubService;
 
-    @PostMapping("/upload")
+    @PostMapping("/upload/image")
     public String uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             return gitHubService.uploadImage(file);
@@ -24,5 +24,15 @@ public class ImageController {
             return "Error: " + e.getMessage();
         }
     }
+    
+    @PostMapping("/upload/document")
+    public String uploadDocument(@RequestParam("file") MultipartFile file) {
+        try {
+            return gitHubService.uploadDocument(file);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
 
 }

@@ -7,5 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface GitHubService {
 
 	public String uploadImage(MultipartFile file);
+	
+
+	public String uploadDocument(MultipartFile file);
 
 }
